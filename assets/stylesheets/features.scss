@@ -1,0 +1,40 @@
+.intro {
+    text-align: center;
+    .brand-heading {
+        width: 30%;
+        margin: 0 auto;
+        @media(max-width:768px) {
+            width: 70%;
+        }
+    }
+    .intro-body {
+        display: table-cell;
+        vertical-align: middle;
+    }
+    @media(min-width:768px) {
+        .intro-body {
+            .intro-text {
+                font-size: 26px;
+            }
+        }
+    }
+}
+.submit-show {
+    margin-top: 50px;
+}
+.beta-submit {
+    font-size: 1.5em;
+    @media (min-width: 1175px) { 
+         font-size: 1.5em;
+    }
+    @media (max-width: 500px) {
+        font-size: 1.5em;
+    }
+}
+.features-content {
+    height: 165px;
+    .learn-more {
+        position: absolute;
+        bottom: 0;
+    }
+}
