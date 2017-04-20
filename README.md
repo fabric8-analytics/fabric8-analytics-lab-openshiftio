@@ -19,3 +19,15 @@ To start
 ---------
 
 Run `npm start`. This will start the UI with livereload enabled.
+
+
+Deploy
+---------
+
+Run `npm run build:prod`. This will trigger build.
+
+Run `docker build --rm -t <username>/<name> .`
+
+Run `docker push <username>/<name>`
+
+Use above docker image to create a project in Openshift.
