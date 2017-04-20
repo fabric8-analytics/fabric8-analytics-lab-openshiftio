@@ -165,7 +165,6 @@ export class ComponentAnalyses {
         $('#componentSpinner').hide();
         $('#tabCompBody').on('click', (event) => {
             event.preventDefault();
-            console.log(event.target);
             if ($(event.target).hasClass('comp-name')) {
                 let ecosystem = event.target.getAttribute('data-ecosystem');
                 let component = event.target.getAttribute('data-component');
