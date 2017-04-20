@@ -29,7 +29,7 @@
 .recommender-inputs {
     .form-control {
         height: 50px;
-        width: 250px !important;
+        width: 350px !important;
     }
 }
 
@@ -63,7 +63,11 @@
             font-weight: 100;
         }
         .overview-code-metric-icon {
-            color: #3f9c35;
+            color: #000;
         }
     }
+}
+
+.first-cap::first-letter {
+    text-transform: UPPERCASE;
 }

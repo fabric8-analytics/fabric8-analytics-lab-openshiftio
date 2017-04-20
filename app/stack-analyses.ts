@@ -12,7 +12,7 @@ export class StackAnalyses {
     constructor() {
         this.stackapiUrl = this
             .api
-            .buildApiUrl(STACK_API_URL, 'recommender.api', 'api/v1');
+            .buildApiUrl("https://recommender.api.prod-preview.openshift.io/api/v1/", 'recommender.api', 'api/v1');
     }
 
     buildStackAnalyses = () => {
@@ -221,12 +221,9 @@ export class StackAnalyses {
     updateFileList = () => {
         var input = <HTMLInputElement>document.getElementById('stackAnalysesFile');
         var output = document.getElementById('fileList');
-
-        // output.innerHTML = '<ul>';
         for (var i = 0; i < input.files.length; ++i) {
             output.innerHTML = '<span>' + input.files.item(i).name + '</span>';
         }
-        // output.innerHTML += '</ul>';
     }
 
     uploadStackAnalysesFile = () => {

@@ -6,7 +6,7 @@ Backend API
 
 Make sure you setup the necessary connections to the backend. You can run it locally by setting these environment variables:
 
-* `export STACK_API_URL="http://recommender.api.prod-preview.openshift.io/api/v1/"`
+* `export FABRIC8_STACK_API_URL="https://api-2445581903445.apicast.io/api/v1/"`
 
 in your .bash_profile and reload the shell.
 

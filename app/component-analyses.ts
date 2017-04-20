@@ -125,10 +125,7 @@ export class ComponentAnalyses {
         $('#componentSpinner').show();
         $('#componentStatusMsg').text('');
         $.ajax({
-            url: stackUri + 'component-analyses/' + ecosystem + '/' + component + '/' + version,
-            headers: {
-                'Content-Type': "application/json"
-            },
+            url: stackUri + 'component-analyses/' + ecosystem + '/' + component + '/' + version + '/?user_key=790ca12fc12a5e268b3aee554034474f',
             method: 'GET',
             success: response => {
                 if (response && response.result && response.result.data) {
@@ -161,19 +158,20 @@ export class ComponentAnalyses {
         let component: string = '';
         let version: string = '';
         $('#compGridCntr').hide();
-        $('.search-result').hide();
+        $('#tableCompResult').hide();
+        $('#searchListView').hide();
         $('#compGridCntrCVE').hide();
         $('#componentStatus').hide();
         $('#componentSpinner').hide();
-        $('#searchListView').on('click', (event) => {
+        $('#tabCompBody').on('click', (event) => {
+            event.preventDefault();
             console.log(event.target);
-            if ($(event.target).hasClass('list-btn')) {
+            if ($(event.target).hasClass('comp-name')) {
                 let ecosystem = event.target.getAttribute('data-ecosystem');
                 let component = event.target.getAttribute('data-component');
                 let version = event.target.getAttribute('data-version');
                 this.fetchCompAnalysis(ecosystem, component, version);
             }
-            //this.callStackAnalysesReportApi();
         });
         $("#componentanalysesform").submit((val: any) => {
             component = $("#component").val();
@@ -181,56 +179,31 @@ export class ComponentAnalyses {
             $('#componentStatusMsg').text('');
             $('#compGridCntr').hide();
             $.ajax({
-                url: stackUri + 'package-search?package=' + component,
-                headers: {
-                    'Content-Type': "application/json"
-                },
+                url: stackUri + 'package-search?package=' + component + '&user_key=790ca12fc12a5e268b3aee554034474f',
                 method: 'GET',
                 success: response => {
-                    // if (response && response.result && response.result.data) {
-                    //     compAnalysesArray = response.result;
-                    //     $('#compGridCntr').show();
-                    //     $('#componentStatus').hide();
-                    //     $('#componentSpinner').hide();
-                    //     this.formCardData(compAnalysesArray);
-                    // } else {
-                    //     $('#compGridCntr').hide();
-                    //     $('#compGridCntrCVE').hide();
-                    //     $('#componentStatus').show();
-                    //     $('#componentStatusMsg').text('No records found for this component');
-                    //     $('#componentSpinner').hide();
-                    // }
-
                     let responseData = JSON.parse(response);
                     $('#componentSpinner').hide();
                     if (responseData && responseData.hasOwnProperty('result') && responseData.result.length > 0) {
-                        $('.search-result').show();
-                        $('#searchListView').html('');
+                        $('#searchListView').hide();
+                        $('#tableCompResult').show();
+                        $('#tabCompBody').empty();
                         let searchList = responseData.result;
                         for (var item in searchList) {
-                            var strToAdd = `<div class="list-view-pf-main-info">
-                          <div class="list-view-pf-left">
-                            <span class="pficon pficon-info"></span>
-                          </div>
-                          <div class="list-view-pf-body">
-                            <div class="list-view-pf-description">
-                              <div class="list-group-item-text">
-                                ${searchList[item].ecosystem} - ${searchList[item].name} ${searchList[item].version}
-                              </div>
-                            </div>
-                          </div>
-                          <div class="list-view-pf-right">
-                            <button class="btn btn-primary list-btn" 
-                            data-ecosystem=${searchList[item].ecosystem}
-                            data-component=${searchList[item].name}
-                            data-version=${searchList[item].version}>
-                            Analyse</button>
-                          </div>
-                        </div>`;
-                            $('#searchListView').append(strToAdd);
+                            var strToAdd = `<tr>
+                                                <td class="first-cap">${searchList[item].ecosystem}</td>
+                                                <td><a class="comp-name" href="#"
+                                                        data-ecosystem=${searchList[item].ecosystem}
+                                                        data-component=${searchList[item].name}
+                                                        data-version=${searchList[item].version}>
+                                                    ${searchList[item].name}</a></td>
+                                                <td>${searchList[item].version}</td>
+                                            </tr>`
+                            $('#tabCompBody').append(strToAdd);
                         }
                     } else {
-                        $('.search-result').show();
+                        $('#tableCompResult').hide();
+                        $('#searchListView').show();
                         $('#searchListView').html('');
                         let strToAdd = `<div class="list-view-pf-main-info">
                           <div class="list-view-pf-left">
@@ -248,11 +221,8 @@ export class ComponentAnalyses {
                     }
                 },
                 error: () => {
-                    // $('#componentSpinner').hide();
-                    // $('#compGridCntr').hide();
-                    // $('#compGridCntrCVE').hide();
-                    // $('#componentStatus').show();
-                    // $('#componentStatusMsg').text('Our records could not match this search');
+                    $('#componentSpinner').hide();
+                    $('#compGridCntr').hide();
                     alert("Failure");
                 }
             });

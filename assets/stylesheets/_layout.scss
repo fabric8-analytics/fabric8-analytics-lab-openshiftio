@@ -110,6 +110,7 @@ body {
 #features {
   background-color: $color-pf-black-200;
   padding-bottom: 50px;
+  padding-top: 50px;
 }
 #recommender {
  // background: url(../images/recommendation-background-80.jpg);
@@ -203,6 +204,9 @@ footer {
 // helps to ensure that scrolling does not cross app footer or header
 .view-container {
   position:relative;
+  width: 100%;
+  padding-left:0;
+  padding-right:0;
   >.view {
     @extend .fill-container;
     &.with-rows {
