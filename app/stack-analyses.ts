@@ -9,6 +9,9 @@ export class StackAnalyses {
     private recommendations: any;
     private dependencies: any;
     private token: string;
+    private cvssScale: any;
+    private keys: any;
+    private headers: any;
 
 
     constructor() {
@@ -65,7 +68,7 @@ export class StackAnalyses {
             let recommendation: any = stackAnalysesData.recommendation.recommendations;
             let dependencies: any = stackAnalysesData.components;
             if (recommendation && recommendation.hasOwnProperty('similar_stacks') && recommendation.similar_stacks.length > 0 &&
-            (recommendation.similar_stacks[0].analysis.missing_packages.length>0 || recommendation.similar_stacks[0].analysis.version_mismatch.length>0)) {
+                (recommendation.similar_stacks[0].analysis.missing_packages.length > 0 || recommendation.similar_stacks[0].analysis.version_mismatch.length > 0)) {
                 this.similarStacks = recommendation.similar_stacks;
                 const analysis: any = this.similarStacks[0].analysis;
                 let missingPackages: Array<any> = analysis.missing_packages;
@@ -82,7 +85,7 @@ export class StackAnalyses {
                           <div class="list-view-pf-body">
                             <div class="list-view-pf-description">
                               <div class="list-group-item-text">
-                               <b>No recommendations.</b> Below are some general information about it.
+                               <b>No recommendations.</b> Below is some general information about it.
                               </div>
                             </div>
                           </div>
@@ -97,45 +100,129 @@ export class StackAnalyses {
                     let components: Array<any> = result.components;
                     // Call the stack-components with the components information so that
                     // It can parse the necessary information and show relevant things.
-                    this.buildDependenciesUI(components);
+                    if (components.length > 0) {
+                         $('#dependenciesListView').show();
+                         $('#dependenciesListViewHdr').show();
+                        this.buildDependenciesUI(components);
+                    }else{
+                        $('#dependenciesListViewHdr').hide();
+                        $('#dependenciesListView').hide();
+                    }
                 }
             }
         }
     }
 
+
+    private getCvssObj(score: any) {
+        if (score) {
+            var iconClass = this.cvssScale.medium.iconClass;
+            var displayClass = this.cvssScale.medium.displayClass;
+            if (score >= this.cvssScale.high.start) {
+                iconClass = this.cvssScale.high.iconClass;
+                displayClass = this.cvssScale.high.displayClass;
+            }
+            return {
+                iconClass: iconClass,
+                displayClass: displayClass,
+                value: score,
+                percentScore: (score / 10 * 100)
+            };
+        }
+    }
+
+    private getCveId(security: any) {
+        if (security && security.vulnerabilities && security.vulnerabilities[0].id) {
+            return security.vulnerabilities[0].id;
+        } else {
+            return 'NA';
+        }
+    }
+
+    private getCvssString(security: any) {
+        if (security && security.vulnerabilities && security.vulnerabilities[0].cvss) {
+            var cvssValue = parseFloat(security.vulnerabilities[0].cvss);
+            return this.getCvssObj(cvssValue);
+        } else {
+            return {
+                value: 'NA'
+            };
+        }
+    }
     private buildDependenciesUI(dependencies: Array<any>): void {
         let length: number = dependencies.length;
         let dependencyTable: JQuery = $('#dependenciesTable');
         let tableHeader: JQuery = dependencyTable.find('thead');
         let tableBody: JQuery = dependencyTable.find('tbody');
 
-        let keys: any = {
+        this.cvssScale = {
+            low: {
+                start: 0.0,
+                end: 3.9,
+                iconClass: 'warningCVE',
+                displayClass: 'progress-bar-warning'
+            },
+            medium: {
+                start: 4.0,
+                end: 6.9,
+                iconClass: 'warningCVE',
+                displayClass: 'progress-bar-warning'
+            },
+            high: {
+                start: 7.0,
+                end: 10.0,
+                iconClass: 'dangerCVE',
+                displayClass: 'progress-bar-danger'
+            }
+        };
+
+        this.keys = {
             name: 'name',
             currentVersion: 'curVersion',
             latestVersion: 'latestVersion',
+            cveid: 'cveid',
+            cvss: 'cvss',
+            license: 'license',
+            linesOfCode: 'linesOfCode',
+            avgCycloComplexity: 'avgCycloComplexity',
+            noOfFiles: 'noOfFiles',
             dateAdded: 'dateAdded',
             publicPopularity: 'pubPopularity',
             enterpriseUsage: 'enterpriseUsage',
             teamUsage: 'teamUsage'
         };
-        let headers: Array<any> = [
+
+        this.headers = [
             {
                 name: 'Name',
-                identifier: keys['name'],
+                identifier: this.keys['name'],
                 isSortable: true
             }, {
                 name: 'Current Version',
-                identifier: keys['currentVersion'],
+                identifier: this.keys['currentVersion'],
                 isSortable: true
             }, {
                 name: 'Latest Version',
-                identifier: keys['latestVersion']
+                identifier: this.keys['latestVersion']
             }, {
-                name: 'Public Popularity',
-                identifier: keys['publicPopularity']
+                name: 'CVE ID',
+                identifier: this.keys['cveid']
             }, {
-                name: 'Enterprise Usage',
-                identifier: keys['enterpriseUsage'],
+                name: 'CVSS',
+                identifier: this.keys['cvss']
+            }, {
+                name: 'License',
+                identifier: this.keys['license']
+            }, {
+                name: 'Lines Of Code',
+                identifier: this.keys['linesOfCode'],
+                isSortable: true
+            }, {
+                name: 'Avgerage Cyclomatic Complexity',
+                identifier: this.keys['avgCycloComplexity']
+            }, {
+                name: 'Total Files',
+                identifier: this.keys['noOfFiles'],
                 isSortable: true
             }
         ];
@@ -148,21 +235,27 @@ export class StackAnalyses {
         for (let i: number = 0; i < length; ++i) {
             dependency = {};
             eachOne = dependencies[i];
-            dependency[keys['name']] = eachOne['name'];
-            dependency[keys['currentVersion']] = eachOne['version'];
-            dependency[keys['latestVersion']] = eachOne['latest_version'] || 'NA';
-            dependency[keys['publicPopularity']] =
-                eachOne['github_details'] ? (eachOne['github_details'].stargazers_count === -1 ? 'NA' : eachOne['github_details'].stargazers_count) : 'NA';
-            dependency[keys['enterpriseUsage']] = eachOne['enterpriseUsage'] || 'NA';
+            let cycloMaticValue = eachOne['code_metrics']['average_cyclomatic_complexity'];
+            dependency[this.keys['name']] = eachOne['name'];
+            dependency[this.keys['currentVersion']] = eachOne['version'];
+            dependency[this.keys['latestVersion']] = eachOne['latest_version'] || 'NA';
+            dependency[this.keys['cveid']] = this.getCveId(eachOne['security']);
+            dependency[this.keys['cvss']] = this.getCvssString(eachOne['security']);
+            dependency[this.keys['license']] = eachOne['licenses'];
+            dependency[this.keys['linesOfCode']] = eachOne['code_metrics']['code_lines'];
 
+            dependency[this.keys['avgCycloComplexity']]
+                = cycloMaticValue !== -1 ? cycloMaticValue : 'NA';
+            dependency[this.keys['noOfFiles']] = eachOne['code_metrics']['total_files'];
             dependenciesList.push(dependency);
         }
 
         this.dependencies = {
-            headers: headers,
+            headers: this.headers,
             list: dependenciesList
         };
         let headerRow: JQuery = $('<tr />').appendTo(tableHeader);
+        let strCvss = '';
         $.map(this.dependencies.headers, (key, value) => {
             $(`<th>${key.name}</th>`).appendTo(headerRow);
         });
@@ -171,8 +264,23 @@ export class StackAnalyses {
             bodyRow.append(`<td>${key.name}</td>`);
             bodyRow.append(`<td>${key.curVersion}</td>`);
             bodyRow.append(`<td>${key.latestVersion}</td>`);
-            bodyRow.append(`<td>${key.pubPopularity}</td>`);
-            bodyRow.append(`<td>${key.enterpriseUsage}</td>`);
+            bodyRow.append(`<td>${key.cveid}</td>`);
+            if (key.cvss.value !== 'NA') {
+                strCvss = '<td><span data-toggle="tooltip" data-placement="top">' +
+                    '<img class="dependencies-cve-icon" src="../assets/images/' + key.cvss.iconClass + '.png"></img>' +
+                    key.cvss.value
+                    + '</span></td>';
+            } else {
+                strCvss = '<td><span>' +
+                    key.cvss.value
+                    + '</span></td>';
+            }
+            bodyRow.append(strCvss);
+            bodyRow.append('<td>' + key.license + '</td>');
+            bodyRow.append('<td>' + key.linesOfCode + '</td>');
+            bodyRow.append('<td>' + key.avgCycloComplexity + '</td>');
+            bodyRow.append('<td>' + key.noOfFiles + '</td>');
+
         });
     }
 

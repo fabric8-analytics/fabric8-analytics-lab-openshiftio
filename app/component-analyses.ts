@@ -74,7 +74,8 @@ export class ComponentAnalyses {
         let cardDataSetObjSummary: any = {};
         let compAnalysesArrayData = compAnalysesArray.data[0];
         cardDataSetObjSummary.alias = "Lines of code";
-        cardDataSetObjSummary.value = compAnalysesArrayData.version.cm_loc[0];
+        cardDataSetObjSummary.value = compAnalysesArrayData.version.cm_loc[0] > 0 ?
+            compAnalysesArrayData.version.cm_loc[0] : "NA";
         cardDataSetObjSummary.icon = "fa-code";
         cardDataSetSummary.push(cardDataSetObjSummary);
         cardDataSetObjSummary = {};
@@ -85,7 +86,8 @@ export class ComponentAnalyses {
         cardDataSetSummary.push(cardDataSetObjSummary);
         cardDataSetObjSummary = {};
         cardDataSetObjSummary.alias = "Number Of Files";
-        cardDataSetObjSummary.value = compAnalysesArrayData.version.cm_num_files[0];
+        cardDataSetObjSummary.value = compAnalysesArrayData.version.cm_num_files[0] > 0 ?
+            compAnalysesArrayData.version.cm_num_files[0] : "NA";
         cardDataSetObjSummary.icon = "fa-file-code-o";
         cardDataSetSummary.push(cardDataSetObjSummary);
         this.buildStackCardTemplate(cardDataSetSummary, "codemetric-card-contents", 4);
