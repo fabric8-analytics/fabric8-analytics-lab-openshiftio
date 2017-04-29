@@ -159,20 +159,20 @@ export class StackAnalyses {
             low: {
                 start: 0.0,
                 end: 3.9,
-                iconClass: 'warningCVE',
-                displayClass: 'progress-bar-warning'
+                iconClass: 'pficon-warning-triangle-o',
+                displayClass: 'warning-icon-cve'
             },
             medium: {
                 start: 4.0,
                 end: 6.9,
-                iconClass: 'warningCVE',
-                displayClass: 'progress-bar-warning'
+                iconClass: 'pficon-warning-triangle-o',
+                displayClass: 'warning-icon-cve'
             },
             high: {
                 start: 7.0,
                 end: 10.0,
-                iconClass: 'dangerCVE',
-                displayClass: 'progress-bar-danger'
+                iconClass: 'pficon-warning-triangle-o',
+                displayClass: 'danger-icon-cve'
             }
         };
 
@@ -267,7 +267,7 @@ export class StackAnalyses {
             bodyRow.append(`<td>${key.cveid}</td>`);
             if (key.cvss.value !== 'NA') {
                 strCvss = '<td><span data-toggle="tooltip" data-placement="top">' +
-                    '<img class="dependencies-cve-icon" src="../assets/images/' + key.cvss.iconClass + '.png"></img>' +
+                    '<span class="pficon '+ key.cvss.iconClass + ' ' + key.cvss.displayClass +'"></span>' +
                     key.cvss.value
                     + '</span></td>';
             } else {

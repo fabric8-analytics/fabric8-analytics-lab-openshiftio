@@ -98,7 +98,35 @@ export class ComponentAnalyses {
         for (let i in compAnalysesCVE) {
             let dataSetCveIDScore: Array<any> = [];
             dataSetCveIDScore = compAnalysesCVE[i].split(':');
-            var strToAdd = `<li class="list-group-item">${dataSetCveIDScore[0]} , CVSS score of ${dataSetCveIDScore[1]}</li>`;
+            if (dataSetCveIDScore[1] > 7){
+                //var strToAdd = `<li class="list-group-item"><span><img class="comp-cve-icon" src="../assets/images/dangerCVE.png"></img> ${dataSetCveIDScore[0]} , CVSS score of ${dataSetCveIDScore[1]}</span></li>`;
+                var strToAdd = `<div class="list-view-pf-main-info">
+                          <div class="list-view-pf-left">
+                            <span class="pficon pficon-warning-triangle-o danger-icon-cve"></span>
+                          </div>
+                          <div class="list-view-pf-body">
+                            <div class="list-view-pf-description">
+                              <div class="list-group-item-text pull-left">
+                                 ${dataSetCveIDScore[0]} , CVSS score of ${dataSetCveIDScore[1]}
+                              </div>
+                            </div>
+                          </div>
+                        </div>`;
+            } else {
+                var strToAdd = `<div class="list-view-pf-main-info">
+                          <div class="list-view-pf-left">
+                            <span class="pficon pficon-warning-triangle-o warning-icon-cve"></span>
+                          </div>
+                          <div class="list-view-pf-body">
+                            <div class="list-view-pf-description">
+                              <div class="list-group-item-text pull-left">
+                                 ${dataSetCveIDScore[0]} , CVSS score of ${dataSetCveIDScore[1]}
+                              </div>
+                            </div>
+                          </div>
+                        </div>`;
+                //var strToAdd = `<li class="list-group-item"><span><img class="comp-cve-icon" src="../assets/images/warningCVE.png"></img> ${dataSetCveIDScore[0]} , CVSS score of ${dataSetCveIDScore[1]}</span></li>`;
+            }
             $('#cve-card-contents').append(strToAdd);
 
         }
@@ -130,7 +158,7 @@ export class ComponentAnalyses {
         $.ajax({
             url: stackUri + 'component-analyses/' + ecosystem + '/' + component + '/' + version,
             method: 'GET',
-            headers: { "Authorization": 'Bearer ' + this.token},
+            headers: { "Authorization": 'Bearer ' + this.token },
             success: response => {
                 if (response && response.result && response.result.data) {
                     compAnalysesArray = response.result;
@@ -156,7 +184,7 @@ export class ComponentAnalyses {
         });
     }
 
-    buildComponentAnalyses = (authToken:string) => {
+    buildComponentAnalyses = (authToken: string) => {
         let stackUri = this.stackApiUrl;
         this.token = authToken;
         let ecosystem: string = '';
