@@ -40,7 +40,7 @@ export class StackAnalyses {
         $.ajax({
             url: this.stackapiUrl + 'stack-analyses/' + this.stackID,
             method: 'GET',
-            headers: { "Authorization": 'Bearer ' + this.token},
+            //headers: { "Authorization": 'Bearer ' + this.token},
             dataType: 'json',
             success: response => {
                 if (response.hasOwnProperty('error')) {
@@ -64,7 +64,8 @@ export class StackAnalyses {
         if (stackAnalysesData.hasOwnProperty('recommendation')) {
             let recommendation: any = stackAnalysesData.recommendation.recommendations;
             let dependencies: any = stackAnalysesData.components;
-            if (recommendation && recommendation.hasOwnProperty('similar_stacks') && recommendation.similar_stacks.length > 0) {
+            if (recommendation && recommendation.hasOwnProperty('similar_stacks') && recommendation.similar_stacks.length > 0 &&
+            (recommendation.similar_stacks[0].analysis.missing_packages.length>0 || recommendation.similar_stacks[0].analysis.version_mismatch.length>0)) {
                 this.similarStacks = recommendation.similar_stacks;
                 const analysis: any = this.similarStacks[0].analysis;
                 let missingPackages: Array<any> = analysis.missing_packages;
@@ -81,7 +82,7 @@ export class StackAnalyses {
                           <div class="list-view-pf-body">
                             <div class="list-view-pf-description">
                               <div class="list-group-item-text">
-                               <b>We have no recommendations for you.</b> Your stack looks great!
+                               <b>No recommendations.</b> Below are some general information about it.
                               </div>
                             </div>
                           </div>
@@ -240,7 +241,7 @@ export class StackAnalyses {
             url: this.stackapiUrl + 'stack-analyses',
             type: 'POST',
             data: data,
-            headers: { "Authorization": 'Bearer ' + this.token},
+            //headers: { "Authorization": 'Bearer ' + this.token},
             cache: false,
             contentType: false,
             processData: false,

@@ -183,7 +183,7 @@ export class ComponentAnalyses {
             $.ajax({
                 url: stackUri + 'package-search?package=' + component,
                 method: 'GET',
-                headers: { "Authorization": 'Bearer ' + this.token},
+                //headers: { "Authorization": 'Bearer ' + this.token},
                 success: response => {
                     let responseData = JSON.parse(response);
                     $('#componentSpinner').hide();
