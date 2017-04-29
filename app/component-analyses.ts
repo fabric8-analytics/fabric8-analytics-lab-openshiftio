@@ -4,6 +4,7 @@ export class ComponentAnalyses {
 
     private stackApiUrl: string;
     private api: ApiLocator = new ApiLocator();
+    private token: string;
 
     constructor() {
         this.stackApiUrl = this
@@ -125,8 +126,9 @@ export class ComponentAnalyses {
         $('#componentSpinner').show();
         $('#componentStatusMsg').text('');
         $.ajax({
-            url: stackUri + 'component-analyses/' + ecosystem + '/' + component + '/' + version + '/?user_key=790ca12fc12a5e268b3aee554034474f',
+            url: stackUri + 'component-analyses/' + ecosystem + '/' + component + '/' + version,
             method: 'GET',
+            headers: { "Authorization": 'Bearer ' + this.token},
             success: response => {
                 if (response && response.result && response.result.data) {
                     compAnalysesArray = response.result;
@@ -152,8 +154,9 @@ export class ComponentAnalyses {
         });
     }
 
-    buildComponentAnalyses = () => {
+    buildComponentAnalyses = (authToken:string) => {
         let stackUri = this.stackApiUrl;
+        this.token = authToken;
         let ecosystem: string = '';
         let component: string = '';
         let version: string = '';
@@ -178,8 +181,9 @@ export class ComponentAnalyses {
             $('#componentStatusMsg').text('');
             $('#compGridCntr').hide();
             $.ajax({
-                url: stackUri + 'package-search?package=' + component + '&user_key=790ca12fc12a5e268b3aee554034474f',
+                url: stackUri + 'package-search?package=' + component,
                 method: 'GET',
+                headers: { "Authorization": 'Bearer ' + this.token},
                 success: response => {
                     let responseData = JSON.parse(response);
                     $('#componentSpinner').hide();

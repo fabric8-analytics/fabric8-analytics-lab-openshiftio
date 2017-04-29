@@ -8,18 +8,21 @@ export class StackAnalyses {
     private similarStacks: any;
     private recommendations: any;
     private dependencies: any;
+    private token: string;
+
 
     constructor() {
         this.stackapiUrl = this
             .api
-            .buildApiUrl("https://recommender.api.prod-preview.openshift.io/api/v1/", 'recommender.api', 'api/v1');
+            .buildApiUrl(STACK_API_URL, 'recommender.api', 'api/v1');
     }
 
-    buildStackAnalyses = () => {
+    buildStackAnalyses = (authToken: string) => {
         $('#pomTextConetntArea').show();
         $('#pomStatusSuccess').hide();
         $('#stackReportCntr').hide();
         $('#stackSpinner').hide();
+        this.token = authToken;
         $('#stackAnalysesAnchor').on('click', () => {
             this.callStackAnalysesReportApi();
         });
@@ -37,6 +40,7 @@ export class StackAnalyses {
         $.ajax({
             url: this.stackapiUrl + 'stack-analyses/' + this.stackID,
             method: 'GET',
+            headers: { "Authorization": 'Bearer ' + this.token},
             dataType: 'json',
             success: response => {
                 if (response.hasOwnProperty('error')) {
@@ -236,6 +240,7 @@ export class StackAnalyses {
             url: this.stackapiUrl + 'stack-analyses',
             type: 'POST',
             data: data,
+            headers: { "Authorization": 'Bearer ' + this.token},
             cache: false,
             contentType: false,
             processData: false,
