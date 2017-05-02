@@ -155,6 +155,7 @@ export class ComponentAnalyses {
         let compAnalysesArray: Array<any>;
         $('#componentSpinner').show();
         $('#componentStatusMsg').text('');
+        $('#compGridCntrCVE').hide();
         $.ajax({
             url: stackUri + 'component-analyses/' + ecosystem + '/' + component + '/' + version,
             method: 'GET',
