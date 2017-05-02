@@ -236,17 +236,20 @@ export class StackAnalyses {
             dependency = {};
             eachOne = dependencies[i];
             let cycloMaticValue = eachOne['code_metrics']['average_cyclomatic_complexity'];
+            let codeLines = eachOne['code_metrics']['code_lines'];
+            let totalFiles = eachOne['code_metrics']['total_files'];
+
             dependency[this.keys['name']] = eachOne['name'];
             dependency[this.keys['currentVersion']] = eachOne['version'];
             dependency[this.keys['latestVersion']] = eachOne['latest_version'] || 'NA';
             dependency[this.keys['cveid']] = this.getCveId(eachOne['security']);
             dependency[this.keys['cvss']] = this.getCvssString(eachOne['security']);
             dependency[this.keys['license']] = eachOne['licenses'];
-            dependency[this.keys['linesOfCode']] = eachOne['code_metrics']['code_lines'];
+            dependency[this.keys['linesOfCode']] = codeLines !== -1 ? codeLines : 'NA';
 
             dependency[this.keys['avgCycloComplexity']]
                 = cycloMaticValue !== -1 ? cycloMaticValue : 'NA';
-            dependency[this.keys['noOfFiles']] = eachOne['code_metrics']['total_files'];
+            dependency[this.keys['noOfFiles']] = totalFiles !== -1 ? totalFiles : 'NA';
             dependenciesList.push(dependency);
         }
 
