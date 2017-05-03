@@ -10,5 +10,5 @@ export NSS_WRAPPER_GROUP=/etc/group;
 if [ $1 == "apache" ]; then
     exec /usr/sbin/httpd -DFOREGROUND;
 else
-    exec $1
+    exec $@
 fi
