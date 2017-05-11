@@ -27,6 +27,20 @@
 }
 
 .recommender-inputs {
+    .component-analyses-form-gp {
+        position: relative;
+        #start {
+            position: absolute;
+            right: 3%;
+            top: 30%;
+            font-size: 20px;
+            color: #ccc;
+            cursor: pointer;
+            &:hover {
+                color: #000;
+            }
+        }
+    }
     .form-control {
         height: 50px;
         width: 350px !important;

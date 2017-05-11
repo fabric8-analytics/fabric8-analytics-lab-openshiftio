@@ -8,6 +8,8 @@ import './header.scss';
 import { ComponentAnalyses } from './component-analyses';
 import { StackAnalyses } from './stack-analyses';
 
+import {SpeechJs} from './speech-js';
+
 declare global {
   interface Window {
     analytics: SegmentAnalytics.AnalyticsJS;
@@ -156,6 +158,8 @@ $(document)
     // Build services for the waitlist widget
     //let waitlist = new Waitlist();
     //waitlist.bindWaitListForm();
+
+    new SpeechJs();
 
     // Build services for analysis of compoment
     let token = '';
