@@ -108,7 +108,8 @@ export class SpeechJs {
         });
 
         this.recognition.onend = ((event: any) => {
-            this._start();
+            //this._start();
+            $('#start').css('color','#ccc');
         });
 
         // var grammar = '#JSGF V1.0; grammar colors; public <color> = aqua | azure | beige ... ;'
@@ -136,5 +137,6 @@ export class SpeechJs {
     }
     _start(): void {
         this.recognition.start();
+        $('#start').css('color','red');
     }
 }

@@ -8,7 +8,7 @@ import './header.scss';
 import { ComponentAnalyses } from './component-analyses';
 import { StackAnalyses } from './stack-analyses';
 
-import {SpeechJs} from './speech-js';
+import { SpeechJs } from './speech-js';
 
 declare global {
   interface Window {
@@ -162,9 +162,9 @@ $(document)
     new SpeechJs();
 
     // Build services for analysis of compoment
-    let token = '';
+    let token = STACK_API_TOKEN;
     let componentAnalyses = new ComponentAnalyses();
-    componentAnalyses.buildComponentAnalyses(token);
+    componentAnalyses.buildComponentAnalyses(token); 
 
     // Build services for analysis of stack
     let stackAnalyses = new StackAnalyses();
