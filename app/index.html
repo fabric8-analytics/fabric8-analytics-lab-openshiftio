@@ -232,7 +232,38 @@
                       </div>
                     </div>
                   </div>
-                  <!--</div>-->
+                  <div id="sentimentScoreCard" class="row">
+                    <div class="col-md-12">
+                      <div class="overview-cards card-pf card-pf-utilization">
+                        <div class="dropdown dropdown-kebab-pf">
+                          <h2 data-toggle="dropdown" class="card-pf-title pficon pficon-info">
+                            Sentiment Score
+                          </h2>
+                          <div class="dropdown-menu infotip">
+                            <div class="arrow"></div>
+                            <ul class="list-group">
+                              <li class="list-group-item">
+                                <b>Average sentiment score</b> represents the average of all the sentiment scores for the component
+                              </li>
+                              <li class="list-group-item">
+                                <b>Latest sentiment score</b> represents the latest sentiment score from the latest comment for the component
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="card-pf-body">
+                          <div class="row make-center">
+                            <div id="sentiment-card-contents">
+                              <span><b>Average sentiment score</b>: </span>
+                              <span id="average-sentiment-score"></span>
+                              <span><b>Latest sentiment score</b>: </span>
+                              <span id="latest-sentiment-score"></span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div id="componentStatus" class="textCenter">

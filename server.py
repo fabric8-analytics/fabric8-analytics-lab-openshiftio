@@ -31,6 +31,10 @@ def handle_component_list(msg):
     emit('component-list-response', json.dumps({'result': component_list_data}))
     disconnect()
 
+@socketio.on_error('/component-list')
+def error_handler(e):
+    raise RuntimeError()
+
 @socketio.on('get_component_analyses', namespace='/component-analyses')
 def handle_component_analyses(msg):
     print(msg);

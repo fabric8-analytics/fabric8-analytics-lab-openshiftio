@@ -16,7 +16,6 @@ export class ComponentAnalyses {
     }
 
     formCardData = (compAnalysesArray: any) => {
-        debugger;
         if (compAnalysesArray.data[0].hasOwnProperty("version") &&
             compAnalysesArray.data[0].hasOwnProperty("package")) {
             this.formStackCardSummary(compAnalysesArray);
@@ -160,6 +159,7 @@ export class ComponentAnalyses {
         $('#componentSpinner').show();
         $('#componentStatusMsg').text('');
         $('#compGridCntrCVE').hide();
+        $('#sentimentScoreCard').hide();
         let socket = Socket.connect('http://127.0.0.1:5012' + this.component_analyses_endpoint);
         socket.on('connect', function () {
             socket.emit('get_component_analyses', 'Call to fetch component analyses data');
@@ -182,6 +182,7 @@ export class ComponentAnalyses {
             }
         });
         socket.on('component-sentiment-response', (response: any) => {
+            $('#sentimentScoreCard').show();
             let responseData = JSON.parse(response);
             let sentimentObj = responseData.result;
             $('#average-sentiment-score').html(sentimentObj.sentiment_details.sentiment.score);
@@ -228,6 +229,7 @@ export class ComponentAnalyses {
         $('#compGridCntrCVE').hide();
         $('#componentStatus').hide();
         $('#componentSpinner').hide();
+        $('#sentimentScoreCard').hide();
         $('#tabCompBody').on('click', (event) => {
             event.preventDefault();
             if ($(event.target).hasClass('comp-name')) {
