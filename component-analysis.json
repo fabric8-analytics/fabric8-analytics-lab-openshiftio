@@ -1,0 +1,86 @@
+{
+    "result": {
+        "data": [{
+            "package": {
+                "ecosystem": [
+                    "maven"
+                ],
+                "gh_forks": [-1],
+                "gh_issues_last_month_closed": [-1],
+                "gh_issues_last_month_opened": [-1],
+                "gh_issues_last_year_closed": [-1],
+                "gh_issues_last_year_opened": [-1],
+                "gh_prs_last_month_closed": [-1],
+                "gh_prs_last_month_opened": [-1],
+                "gh_prs_last_year_closed": [-1],
+                "gh_prs_last_year_opened": [-1],
+                "gh_stargazers": [-1],
+                "last_updated": [
+                    1493180423.88
+                ],
+                "latest_version": [
+                    "3.4.1"
+                ],
+                "name": [
+                    "io.vertx:vertx-web"
+                ],
+                "package_dependents_count": [-1],
+                "package_relative_used": [
+                    "not used"
+                ],
+                "tokens": [
+                    "io",
+                    "vertx",
+                    "web"
+                ],
+                "vertex_label": [
+                    "Package"
+                ]
+            },
+            "version": {
+                "cm_avg_cyclomatic_complexity": [
+                    1.22
+                ],
+                "cm_loc": [
+                    37699
+                ],
+                "cm_num_files": [
+                    239
+                ],
+                "dependents_count": [-1],
+                "description": [
+                    "sonatype helps open source projects to set up maven repositories on httpsosssonatypeorg"
+                ],
+                "last_updated": [
+                    1493180423.88
+                ],
+                "licenses": [
+                    "ASL 2.0",
+                    "Free Art",
+                    "Rsfs"
+                ],
+                "pecosystem": [
+                    "maven"
+                ],
+                "pname": [
+                    "io.vertx:vertx-web"
+                ],
+                "shipped_as_downstream": [
+                    false
+                ],
+                "version": [
+                    "3.4.1"
+                ],
+                "vertex_label": [
+                    "Version"
+                ]
+            }
+        }],
+        "recommendation": {}
+    },
+    "schema": {
+        "name": "analyses_graphdb",
+        "url": "http://recommender.api.openshift.io/api/v1/schemas/api/analyses_graphdb/1-2-0/",
+        "version": "1-2-0"
+    }
+}

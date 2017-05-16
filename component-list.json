@@ -1,0 +1,23 @@
+{
+    "result": [{
+        "name": "io.vertx:vertx-web",
+        "ecosystem": "maven",
+        "version": "3.4.1"
+    }, {
+        "name": "io.vertx:vertx-config",
+        "ecosystem": "maven",
+        "version": "3.4.1"
+    }, {
+        "name": "io.vertx:vertx-rx-java",
+        "ecosystem": "maven",
+        "version": "3.4.1"
+    }, {
+        "name": "io.vertx:vertx-core",
+        "ecosystem": "maven",
+        "version": "3.4.1"
+    }, {
+        "name": "io.vertx:vertx-jdbc-client",
+        "ecosystem": "maven",
+        "version": "3.4.1"
+    }]
+}

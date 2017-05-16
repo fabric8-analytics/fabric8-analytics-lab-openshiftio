@@ -1,3 +1,4 @@
+import * as Socket from 'socket.io-client';
 import { ApiLocator } from './index';
 
 export class ComponentAnalyses {
@@ -5,6 +6,8 @@ export class ComponentAnalyses {
     private stackApiUrl: string;
     private api: ApiLocator = new ApiLocator();
     private token: string;
+    private component_list_endpoint: string = '/component-list';
+    private component_analyses_endpoint: string = '/component-analyses';
 
     constructor() {
         this.stackApiUrl = this
@@ -13,6 +16,7 @@ export class ComponentAnalyses {
     }
 
     formCardData = (compAnalysesArray: any) => {
+        debugger;
         if (compAnalysesArray.data[0].hasOwnProperty("version") &&
             compAnalysesArray.data[0].hasOwnProperty("package")) {
             this.formStackCardSummary(compAnalysesArray);
@@ -98,7 +102,7 @@ export class ComponentAnalyses {
         for (let i in compAnalysesCVE) {
             let dataSetCveIDScore: Array<any> = [];
             dataSetCveIDScore = compAnalysesCVE[i].split(':');
-            if (dataSetCveIDScore[1] > 7){
+            if (dataSetCveIDScore[1] > 7) {
                 //var strToAdd = `<li class="list-group-item"><span><img class="comp-cve-icon" src="../assets/images/dangerCVE.png"></img> ${dataSetCveIDScore[0]} , CVSS score of ${dataSetCveIDScore[1]}</span></li>`;
                 var strToAdd = `<div class="list-view-pf-main-info">
                           <div class="list-view-pf-left">
@@ -156,33 +160,60 @@ export class ComponentAnalyses {
         $('#componentSpinner').show();
         $('#componentStatusMsg').text('');
         $('#compGridCntrCVE').hide();
-        $.ajax({
-            url: stackUri + 'component-analyses/' + ecosystem + '/' + component + '/' + version,
-            method: 'GET',
-            headers: { "Authorization": 'Bearer ' + this.token },
-            success: response => {
-                if (response && response.result && response.result.data) {
-                    compAnalysesArray = response.result;
-                    $('#compGridCntr').show();
-                    $('#componentStatus').hide();
-                    $('#componentSpinner').hide();
-                    this.formCardData(compAnalysesArray);
-                } else {
-                    $('#compGridCntr').hide();
-                    $('#compGridCntrCVE').hide();
-                    $('#componentStatus').show();
-                    $('#componentStatusMsg').text('No records found for this component');
-                    $('#componentSpinner').hide();
-                }
-            },
-            error: () => {
+        let socket = Socket.connect('http://127.0.0.1:5012' + this.component_analyses_endpoint);
+        socket.on('connect', function () {
+            socket.emit('get_component_analyses', 'Call to fetch component analyses data');
+        });
+        socket.on('component-analyses-response', (response: any) => {
+            let responseData = JSON.parse(response);
+                responseData = responseData.result;
+            if (responseData && responseData.result) {
+                compAnalysesArray = responseData.result;
+                $('#compGridCntr').show();
+                $('#componentStatus').hide();
                 $('#componentSpinner').hide();
+                this.formCardData(compAnalysesArray);
+            } else {
                 $('#compGridCntr').hide();
                 $('#compGridCntrCVE').hide();
                 $('#componentStatus').show();
-                $('#componentStatusMsg').text('Our records could not match this search');
+                $('#componentStatusMsg').text('No records found for this component');
+                $('#componentSpinner').hide();
             }
         });
+        socket.on('component-sentiment-response', (response: any) => {
+            let responseData = JSON.parse(response);
+            let sentimentObj = responseData.result;
+            $('#average-sentiment-score').html(sentimentObj.sentiment_details.sentiment.score);
+            $('#latest-sentiment-score').html(sentimentObj.sentiment_details.latest_comment_details.score);
+        });
+        // $.ajax({
+        //     url: stackUri + 'component-analyses/' + ecosystem + '/' + component + '/' + version,
+        //     method: 'GET',
+        //     headers: { "Authorization": 'Bearer ' + this.token },
+        //     success: response => {
+        //         if (response && response.result && response.result.data) {
+        //             compAnalysesArray = response.result;
+        //             $('#compGridCntr').show();
+        //             $('#componentStatus').hide();
+        //             $('#componentSpinner').hide();
+        //             this.formCardData(compAnalysesArray);
+        //         } else {
+        //             $('#compGridCntr').hide();
+        //             $('#compGridCntrCVE').hide();
+        //             $('#componentStatus').show();
+        //             $('#componentStatusMsg').text('No records found for this component');
+        //             $('#componentSpinner').hide();
+        //         }
+        //     },
+        //     error: () => {
+        //         $('#componentSpinner').hide();
+        //         $('#compGridCntr').hide();
+        //         $('#compGridCntrCVE').hide();
+        //         $('#componentStatus').show();
+        //         $('#componentStatusMsg').text('Our records could not match this search');
+        //     }
+        // });
     }
 
     buildComponentAnalyses = (authToken: string) => {
@@ -211,35 +242,37 @@ export class ComponentAnalyses {
             $('#componentSpinner').show();
             $('#componentStatusMsg').text('');
             $('#compGridCntr').hide();
-            $.ajax({
-                url: stackUri + 'package-search?package=' + component,
-                method: 'GET',
-                //headers: { "Authorization": 'Bearer ' + this.token},
-                success: response => {
-                    let responseData = JSON.parse(response);
-                    $('#componentSpinner').hide();
-                    if (responseData && responseData.hasOwnProperty('result') && responseData.result.length > 0) {
-                        $('#searchListView').hide();
-                        $('#tableCompResult').show();
-                        $('#tabCompBody').empty();
-                        let searchList = responseData.result;
-                        for (var item in searchList) {
-                            var strToAdd = `<tr>
-                                                <td class="first-cap">${searchList[item].ecosystem}</td>
-                                                <td><a class="comp-name" href="#"
-                                                        data-ecosystem=${searchList[item].ecosystem}
-                                                        data-component=${searchList[item].name}
-                                                        data-version=${searchList[item].version}>
-                                                    ${searchList[item].name}</a></td>
-                                                <td>${searchList[item].version}</td>
-                                            </tr>`
-                            $('#tabCompBody').append(strToAdd);
-                        }
-                    } else {
-                        $('#tableCompResult').hide();
-                        $('#searchListView').show();
-                        $('#searchListView').html('');
-                        let strToAdd = `<div class="list-view-pf-main-info">
+            event.preventDefault();
+            let socket = Socket.connect('http://127.0.0.1:5012' + this.component_list_endpoint);
+            socket.on('connect', function () {
+                socket.emit('get_component_list', 'Call to fetch component list');
+            });
+            socket.on('component-list-response', function (response: any) {
+                let responseData = JSON.parse(response);
+                responseData = responseData.result;
+                $('#componentSpinner').hide();
+                if (responseData && responseData.result) {
+                    $('#searchListView').hide();
+                    $('#tableCompResult').show();
+                    $('#tabCompBody').empty();
+                    let searchList = responseData.result;
+                    for (var item in searchList) {
+                        var strToAdd = `<tr>
+                            <td class="first-cap">${searchList[item].ecosystem}</td>
+                            <td><a class="comp-name" href="#"
+                                    data-ecosystem=${searchList[item].ecosystem}
+                                    data-component=${searchList[item].name}
+                                    data-version=${searchList[item].version}>
+                                ${searchList[item].name}</a></td>
+                            <td>${searchList[item].version}</td>
+                        </tr>`
+                        $('#tabCompBody').append(strToAdd);
+                    }
+                } else {
+                    $('#tableCompResult').hide();
+                    $('#searchListView').show();
+                    $('#searchListView').html('');
+                    let strToAdd = `<div class="list-view-pf-main-info">
                           <div class="list-view-pf-left">
                             <span class="pficon pficon-warning-triangle-o"></span>
                           </div>
@@ -251,21 +284,64 @@ export class ComponentAnalyses {
                             </div>
                           </div>
                         </div>`;
-                        $('#searchListView').append(strToAdd);
-                    }
-                },
-                error: () => {
-                    $('#componentSpinner').hide();
-                    $('#compGridCntr').hide();
-                    alert("Failure");
+                    $('#searchListView').append(strToAdd);
                 }
             });
-            event.preventDefault();
-        });
-        $("#componentanalysesform-1").submit((val: any) => {
+            //     $.ajax({
+            //         url: stackUri + 'package-search?package=' + component,
+            //         method: 'GET',
+            //         //headers: { "Authorization": 'Bearer ' + this.token},
+            //         success: response => {
+            //             let responseData = JSON.parse(response);
+            //             $('#componentSpinner').hide();
+            //             if (responseData && responseData.hasOwnProperty('result') && responseData.result.length > 0) {
+            //                 $('#searchListView').hide();
+            //                 $('#tableCompResult').show();
+            //                 $('#tabCompBody').empty();
+            //                 let searchList = responseData.result;
+            //                 for (var item in searchList) {
+            //                     var strToAdd = `<tr>
+            //                                         <td class="first-cap">${searchList[item].ecosystem}</td>
+            //                                         <td><a class="comp-name" href="#"
+            //                                                 data-ecosystem=${searchList[item].ecosystem}
+            //                                                 data-component=${searchList[item].name}
+            //                                                 data-version=${searchList[item].version}>
+            //                                             ${searchList[item].name}</a></td>
+            //                                         <td>${searchList[item].version}</td>
+            //                                     </tr>`
+            //                     $('#tabCompBody').append(strToAdd);
+            //                 }
+            //             } else {
+            //                 $('#tableCompResult').hide();
+            //                 $('#searchListView').show();
+            //                 $('#searchListView').html('');
+            //                 let strToAdd = `<div class="list-view-pf-main-info">
+            //                   <div class="list-view-pf-left">
+            //                     <span class="pficon pficon-warning-triangle-o"></span>
+            //                   </div>
+            //                   <div class="list-view-pf-body">
+            //                     <div class="list-view-pf-description">
+            //                       <div class="list-group-item-text">
+            //                        <b>We don't have any matching result.</b> Try something else!
+            //                       </div>
+            //                     </div>
+            //                   </div>
+            //                 </div>`;
+            //                 $('#searchListView').append(strToAdd);
+            //             }
+            //         },
+            //         error: () => {
+            //             $('#componentSpinner').hide();
+            //             $('#compGridCntr').hide();
+            //             alert("Failure");
+            //         }
+            //     });
+            //     event.preventDefault();
+            // });
+            $("#componentanalysesform-1").submit((val: any) => {
 
-            event.preventDefault();
-        });
-    }
+                event.preventDefault();
+            });
+        }
 
 }
