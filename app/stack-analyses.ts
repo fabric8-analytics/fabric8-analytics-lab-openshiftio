@@ -43,7 +43,7 @@ export class StackAnalyses {
         $.ajax({
             url: this.stackapiUrl + 'stack-analyses/' + this.stackID,
             method: 'GET',
-            //headers: { "Authorization": 'Bearer ' + this.token},
+            headers: { "Authorization": 'Bearer ' + this.token},
             dataType: 'json',
             success: response => {
                 if (response.hasOwnProperty('error')) {
@@ -352,7 +352,7 @@ export class StackAnalyses {
             url: this.stackapiUrl + 'stack-analyses',
             type: 'POST',
             data: data,
-            //headers: { "Authorization": 'Bearer ' + this.token},
+            headers: { "Authorization": 'Bearer ' + this.token},
             cache: false,
             contentType: false,
             processData: false,
