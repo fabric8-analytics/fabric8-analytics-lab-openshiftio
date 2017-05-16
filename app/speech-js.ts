@@ -78,7 +78,6 @@ export class SpeechJs {
                 document.getElementById('stackbtn').click();
             }
         }
-        // document.getElementById('stackbtn').click();
     }
         
     _handleSpeech(): void {
@@ -93,47 +92,19 @@ export class SpeechJs {
                 if (event.results[i].isFinal) {
                     let text = (event.results[i][0].transcript);
                     console.log(text);
-
-                    // this.result.value += (event.results[i][0].transcript);
-
                     for (let key in this.commands) {
                         if (text.indexOf(key) !== -1) {
                             this._handleCases(key);
                         }
                     }
                 }
-                //console.log(event.results[i]);
-                //result.innerHTML += (event.results[i][0].transcript);
             }
         });
 
         this.recognition.onend = ((event: any) => {
-            //this._start();
             $('#start').css('color','#ccc');
         });
 
-        // var grammar = '#JSGF V1.0; grammar colors; public <color> = aqua | azure | beige ... ;'
-        //var this.recognition = new SpeechRecognition();
-        // var speechRecognitionList = new SpeechGrammarList();
-        // speechRecognitionList.addFromString(grammar, 1);
-        // this.recognition.grammars = speechRecognitionList;
-
-        /*[
-        'onaudiostart',
-        'onaudioend',
-        'onend',
-        'onerror',
-        'onnomatch',
-        'onresult',
-        'onsoundstart',
-        'onsoundend',
-        'onspeechend',
-        'onstart'
-        ].forEach(function(eventName) {
-            this.recognition[eventName] = function(e) {
-                console.log(eventName, e);
-            };
-        });*/
     }
     _start(): void {
         this.recognition.start();
