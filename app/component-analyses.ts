@@ -6,7 +6,7 @@ export class ComponentAnalyses {
     private stackApiUrl: string;
     private api: ApiLocator = new ApiLocator();
     private token: string;
-    private component_list_endpoint: string = '/component-list';
+    private component_list_endpoint: string = '/package-search';
     private component_analyses_endpoint: string = '/component-analyses';
 
     constructor() {
@@ -160,19 +160,28 @@ export class ComponentAnalyses {
         $('#componentStatusMsg').text('');
         $('#compGridCntrCVE').hide();
         $('#sentimentScoreCard').hide();
-        let socket = Socket.connect('http://127.0.0.1:5012' + this.component_analyses_endpoint);
+        let socket = Socket.connect('http://127.0.0.1:5012' + this.component_analyses_endpoint, {
+            reconnectionAttempts: 3,
+            timeout: 20000
+        });
         socket.on('connect', function () {
             socket.emit('get_component_analyses', 'Call to fetch component analyses data');
         });
         socket.on('component-analyses-response', (response: any) => {
             let responseData = JSON.parse(response);
-                responseData = responseData.result;
             if (responseData && responseData.result) {
                 compAnalysesArray = responseData.result;
                 $('#compGridCntr').show();
                 $('#componentStatus').hide();
                 $('#componentSpinner').hide();
                 this.formCardData(compAnalysesArray);
+                let $componentVersionCardHeight = $('#componentVersionCard').height();
+                let $componentCodeMetricsCardHeight = $('#componentCodeMetricsCard').height();
+                if ($componentVersionCardHeight < $componentCodeMetricsCardHeight) {
+                    $('#componentVersionCard').height($componentCodeMetricsCardHeight + 'px');
+                } else {
+                    $('#componentCodeMetricsCard').height($componentVersionCardHeight + 'px');
+                }
             } else {
                 $('#compGridCntr').hide();
                 $('#compGridCntrCVE').hide();
@@ -187,6 +196,18 @@ export class ComponentAnalyses {
             let sentimentObj = responseData.result;
             $('#average-sentiment-score').html(sentimentObj.sentiment_details.sentiment.score);
             $('#latest-sentiment-score').html(sentimentObj.sentiment_details.latest_comment_details.score);
+        });
+        socket.on('connect_error', (error: any) => {
+            console.log('connect error -', error);
+        });
+        socket.on('error', (error: any) => {
+            console.log('error -', error);
+        });
+        socket.on('connect_timeout', (response: any) => {
+            console.log('socket timeout -', response);
+        });
+        socket.on('disconnect', (response: any) => {
+            console.log('socket disconnected -', response);
         });
         // $.ajax({
         //     url: stackUri + 'component-analyses/' + ecosystem + '/' + component + '/' + version,
@@ -245,105 +266,64 @@ export class ComponentAnalyses {
             $('#componentStatusMsg').text('');
             $('#compGridCntr').hide();
             event.preventDefault();
-            let socket = Socket.connect('http://127.0.0.1:5012' + this.component_list_endpoint);
-            socket.on('connect', function () {
-                socket.emit('get_component_list', 'Call to fetch component list');
-            });
-            socket.on('component-list-response', function (response: any) {
-                let responseData = JSON.parse(response);
-                responseData = responseData.result;
-                $('#componentSpinner').hide();
-                if (responseData && responseData.result) {
-                    $('#searchListView').hide();
-                    $('#tableCompResult').show();
-                    $('#tabCompBody').empty();
-                    let searchList = responseData.result;
-                    for (var item in searchList) {
-                        var strToAdd = `<tr>
-                            <td class="first-cap">${searchList[item].ecosystem}</td>
-                            <td><a class="comp-name" href="#"
-                                    data-ecosystem=${searchList[item].ecosystem}
-                                    data-component=${searchList[item].name}
-                                    data-version=${searchList[item].version}>
-                                ${searchList[item].name}</a></td>
-                            <td>${searchList[item].version}</td>
-                        </tr>`
-                        $('#tabCompBody').append(strToAdd);
-                    }
-                } else {
-                    $('#tableCompResult').hide();
-                    $('#searchListView').show();
-                    $('#searchListView').html('');
-                    let strToAdd = `<div class="list-view-pf-main-info">
-                          <div class="list-view-pf-left">
-                            <span class="pficon pficon-warning-triangle-o"></span>
-                          </div>
-                          <div class="list-view-pf-body">
-                            <div class="list-view-pf-description">
-                              <div class="list-group-item-text">
-                               <b>We don't have any matching result.</b> Try something else!
+            $.ajax({
+                // url: stackUri + 'package-search?package=' + component,
+                url: 'http://127.0.0.1:5012' + this.component_list_endpoint + '?package=' + component,
+                method: 'GET',
+                contentType: 'application/json',
+                // headers: { "Authorization": 'Bearer ' + this.token},
+                success: response => {
+                    var responseData = response;
+                    $('#componentSpinner').hide();
+                    if (responseData && responseData.result) {
+                        $('#searchListView').hide();
+                        $('#tableCompResult').show();
+                        $('#tabCompBody').empty();
+                        let searchList = responseData.result;
+                        for (var item in searchList) {
+                            var strToAdd = `<tr>
+                                                    <td class="first-cap">${searchList[item].ecosystem}</td>
+                                                    <td><a class="comp-name" href="#"
+                                                            data-ecosystem=${searchList[item].ecosystem}
+                                                            data-component=${searchList[item].name}
+                                                            data-version=${searchList[item].version}>
+                                                        ${searchList[item].name}</a></td>
+                                                    <td>${searchList[item].version}</td>
+                                                </tr>`
+                            $('#tabCompBody').append(strToAdd);
+                        }
+                    } else {
+                        $('#tableCompResult').hide();
+                        $('#searchListView').show();
+                        $('#searchListView').html('');
+                        let strToAdd = `<div class="list-view-pf-main-info">
+                              <div class="list-view-pf-left">
+                                <span class="pficon pficon-warning-triangle-o"></span>
                               </div>
-                            </div>
-                          </div>
-                        </div>`;
-                    $('#searchListView').append(strToAdd);
+                              <div class="list-view-pf-body">
+                                <div class="list-view-pf-description">
+                                  <div class="list-group-item-text">
+                                   <b>We don't have any matching result.</b> Try something else!
+                                  </div>
+                                </div>
+                              </div>
+                            </div>`;
+                        $('#searchListView').append(strToAdd);
+                    }
+                },
+                error: (e) => {
+                    console.log(e);
+                    $('#componentSpinner').hide();
+                    $('#compGridCntr').hide();
+                    alert("Failure");
                 }
             });
-            //     $.ajax({
-            //         url: stackUri + 'package-search?package=' + component,
-            //         method: 'GET',
-            //         //headers: { "Authorization": 'Bearer ' + this.token},
-            //         success: response => {
-            //             let responseData = JSON.parse(response);
-            //             $('#componentSpinner').hide();
-            //             if (responseData && responseData.hasOwnProperty('result') && responseData.result.length > 0) {
-            //                 $('#searchListView').hide();
-            //                 $('#tableCompResult').show();
-            //                 $('#tabCompBody').empty();
-            //                 let searchList = responseData.result;
-            //                 for (var item in searchList) {
-            //                     var strToAdd = `<tr>
-            //                                         <td class="first-cap">${searchList[item].ecosystem}</td>
-            //                                         <td><a class="comp-name" href="#"
-            //                                                 data-ecosystem=${searchList[item].ecosystem}
-            //                                                 data-component=${searchList[item].name}
-            //                                                 data-version=${searchList[item].version}>
-            //                                             ${searchList[item].name}</a></td>
-            //                                         <td>${searchList[item].version}</td>
-            //                                     </tr>`
-            //                     $('#tabCompBody').append(strToAdd);
-            //                 }
-            //             } else {
-            //                 $('#tableCompResult').hide();
-            //                 $('#searchListView').show();
-            //                 $('#searchListView').html('');
-            //                 let strToAdd = `<div class="list-view-pf-main-info">
-            //                   <div class="list-view-pf-left">
-            //                     <span class="pficon pficon-warning-triangle-o"></span>
-            //                   </div>
-            //                   <div class="list-view-pf-body">
-            //                     <div class="list-view-pf-description">
-            //                       <div class="list-group-item-text">
-            //                        <b>We don't have any matching result.</b> Try something else!
-            //                       </div>
-            //                     </div>
-            //                   </div>
-            //                 </div>`;
-            //                 $('#searchListView').append(strToAdd);
-            //             }
-            //         },
-            //         error: () => {
-            //             $('#componentSpinner').hide();
-            //             $('#compGridCntr').hide();
-            //             alert("Failure");
-            //         }
-            //     });
-            //     event.preventDefault();
-            // });
-            $("#componentanalysesform-1").submit((val: any) => {
+            event.preventDefault();
+        });
+        $("#componentanalysesform-1").submit((val: any) => {
 
-                event.preventDefault();
-            });
-        }
+            event.preventDefault();
+        });
+    }
 
 }
