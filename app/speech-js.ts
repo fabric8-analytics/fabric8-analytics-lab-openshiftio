@@ -22,13 +22,13 @@ export class SpeechJs {
         const {mozSpeechRecognition}: WindowInterface = <WindowInterface> window;
         this.result = document.getElementById('component');
         this.recognition = new (webkitSpeechRecognition || mozSpeechRecognition || SpeechRecognition)();
-        this._handleSpeech();
         this._handleEvents();
     }
 
     private _handleEvents(): void {
         document.getElementById('start').addEventListener('click', (event: any) => {
             event.preventDefault();
+            this._handleSpeech();
             this._start();
             return false;
         });
@@ -70,7 +70,7 @@ export class SpeechJs {
             if (e.results[i].isFinal) {
                 let text: string = (e.results[i][0].transcript);
                 text = text.toLowerCase();
-                let packageName: string = text.split(keyword)[1].trim();
+                let packageName: string = text.split(keyword)[1];
                 if (packageName.indexOf(' ')) {
                     packageName = packageName.split(' ').join('');
                 }

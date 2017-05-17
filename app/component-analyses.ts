@@ -98,7 +98,7 @@ export class ComponentAnalyses {
         for (let i in compAnalysesCVE) {
             let dataSetCveIDScore: Array<any> = [];
             dataSetCveIDScore = compAnalysesCVE[i].split(':');
-            if (dataSetCveIDScore[1] > 7){
+            if (dataSetCveIDScore[1] > 7) {
                 //var strToAdd = `<li class="list-group-item"><span><img class="comp-cve-icon" src="../assets/images/dangerCVE.png"></img> ${dataSetCveIDScore[0]} , CVSS score of ${dataSetCveIDScore[1]}</span></li>`;
                 var strToAdd = `<div class="list-view-pf-main-info">
                           <div class="list-view-pf-left">
@@ -156,7 +156,7 @@ export class ComponentAnalyses {
         $('#componentSpinner').show();
         $('#componentStatusMsg').text('');
         $('#compGridCntrCVE').hide();
-        
+
         $.ajax({
             url: stackUri + 'component-analyses/' + ecosystem + '/' + component + '/' + version,
             method: 'GET',
@@ -215,10 +215,15 @@ export class ComponentAnalyses {
             $.ajax({
                 url: stackUri + 'package-search?package=' + component,
                 method: 'GET',
-                headers: { "Authorization": 'Bearer ' + this.token},
+                headers: { "Authorization": 'Bearer ' + this.token },
                 success: response => {
-                    let responseData = JSON.parse(response);
+                    let responseData: any;
                     $('#componentSpinner').hide();
+                    try {
+                        responseData = JSON.parse(response);
+                    } catch (e) {
+                        return false;
+                    }
                     if (responseData && responseData.hasOwnProperty('result') && responseData.result.length > 0) {
                         $('#searchListView').hide();
                         $('#tableCompResult').show();
