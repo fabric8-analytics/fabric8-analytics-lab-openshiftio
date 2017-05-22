@@ -2,3 +2,7 @@
 declare var AUTH_API_URL: string;
 declare var STACK_API_URL: string;
 declare var ANALYTICS_WRITE_KEY: string;
+declare module 'socket.io-client' {
+    var e: any;
+    export = e;
+}
